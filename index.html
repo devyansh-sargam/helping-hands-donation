@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helping Hands - Connect Donors with Those in Need</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark-bg: #0f172a;
+            --dark-card: #1e293b;
+            --dark-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-100vh) translateX(100px); }
+        }
+
+        /* Header */
+        header {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: '🤝';
+            font-size: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s 0.2s backwards;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            animation: fadeInUp 1s 0.4s backwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Section */
+        .stats {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: var(--dark-card);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            animation: fadeInUp 1s backwards;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+            border-color: var(--primary);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .card {
+            background: var(--dark-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            animation: fadeInUp 0.6s backwards;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+            border-color: var(--primary);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-urgent {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .badge-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge-completed {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--dark-hover);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            transition: width 1s ease;
+            animation: progressAnimation 2s ease-in-out;
+        }
+
+        @keyframes progressAnimation {
+            from { width: 0; }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--dark-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Payment Section */
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .payment-method {
+            padding: 1rem;
+            background: var(--dark-bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .payment-method:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .payment-method.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .payment-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark-card);
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success Message */
+        .success-message {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeInUp 0.5s;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <!-- Floating Particles -->
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 8s;"></div>
+
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">Helping Hands</div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#donate">Donate</a>
+                <a href="#requests">Requests</a>
+                <a href="#about">About</a>
+                <button class="btn btn-primary" onclick="openModal('loginModal')">Login / Sign Up</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <h1>Make a Difference Today</h1>
+        <p>Connect donors with those in need. Every contribution counts, every act of kindness matters.</p>
+        <div class="hero-buttons">
+            <button class="btn btn-primary" onclick="openModal('donateModal')">Donate Now</button>
+            <button class="btn btn-secondary" onclick="openModal('requestModal')">Request Help</button>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stat-card">
+            <div class="stat-number">12,543</div>
+            <div class="stat-label">Total Donations</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">8,921</div>
+            <div class="stat-label">People Helped</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">₹45.2L</div>
+            <div class="stat-label">Funds Raised</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">156</div>
+            <div class="stat-label">Active Requests</div>
+        </div>
+    </section>
+
+    <!-- Active Requests Section -->
+    <section class="container" id="requests">
+        <h2 class="section-title">Active Help Requests</h2>
+        <div class="cards-grid" id="requestsGrid">
+            <!-- Request Card 1 -->
+            <div class="card">
+                <div class="card-image">🏥</div>
+                <div class="card-content">
+                    <h3 class="card-title">Medical Emergency - Cancer Treatment</h3>
+                    <p class="card-description">Urgent help needed for cancer treatment. Family struggling with medical expenses.</p>
+                    <div class="card-meta">
+                        <span class="badge badge-urgent">Urgent</span>
+                        <span style="color: var(--text-secondary);">Posted 2 days ago</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                        <span style="color: var(--text-secondary);">₹3,25,000 raised</span>
+                        <span style="color: var(--primary); font-weight: bold;">₹5,00,000 goal</span>
+                    </div>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Medical Emergency')">Donate Now</button>
+                </div>
+            </div>
+
+            <!-- Request Card 2 -->
+            <div class="card">
+                <div class="card-image">📚</div>
+                <div class="card-content">
+                    <h3 class="card-title">Education Support for Underprivileged</h3>
+                    <p class="card-description">Help provide books, uniforms, and school supplies for 50 children from low-income families.</p>
+                    <div class="card-meta">
+                        <span class="badge badge-active">Active</span>
+                        <span style="color: var(--text-secondary);">Posted 5 days ago</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 42%;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                        <span style="color: var(--text-secondary);">₹42,000 raised</span>
+                        <span style="color: var(--primary); font-weight: bold;">₹1,00,000 goal</span>
+                    </div>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Education Support')">Donate Now</button>
+                </div>
+            </div>
+
+            <!-- Request Card 3 -->
+            <div class="card">
+                <div class="card-image">🍲</div>
+                <div class="card-content">
+                    <h3 class="card-title">Food Distribution Drive</h3>
+                    <p class="card-description">Monthly food distribution for homeless and daily wage workers affected by economic crisis.</p>
+                    <div class="card-meta">
+                        <span class="badge badge-active">Active</span>
+                        <span style="color: var(--text-secondary);">Posted 1 week ago</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                        <span style="color: var(--text-secondary);">₹78,000 raised</span>
+                        <span style="color: var(--primary); font-weight: bold;">₹1,00,000 goal</span>
+                    </div>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Food Distribution')">Donate Now</button>
+                </div>
+            </div>
+
+            <!-- Request Card 4 -->
+            <div class="card">
+                <div class="card-image">🏠</div>
+                <div class="card-content">
+                    <h3 class="card-title">Shelter for Flood Victims</h3>
+                    <p class="card-description">Emergency shelter and basic necessities for families displaced by recent floods.</p>
+                    <div class="card-meta">
+                        <span class="badge badge-urgent">Urgent</span>
+                        <span style="color: var(--text-secondary);">Posted 3 days ago</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 55%;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                        <span style="color: var(--text-secondary);">₹2,75,000 raised</span>
+                        <span style="color: var(--primary); font-weight: bold;">₹5,00,000 goal</span>
+                    </div>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Flood Relief')">Donate Now</button>
+                </div>
+            </div>
+
+            <!-- Request Card 5 -->
+            <div class="card">
+                <div class="card-image">👕</div>
+                <div class="card-content">
+                    <h3 class="card-title">Winter Clothing Drive</h3>
+                    <p class="card-description">Collecting warm clothes, blankets, and winter essentials for homeless people.</p>
+                    <div class="card-meta">
+                        <span class="badge badge-active">Active</span>
+                        <span style="color: var(--text-secondary);">Posted 4 days ago</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                        <span style="color: var(--text-secondary);">₹30,000 raised</span>
+                        <span style="color: var(--primary); font-weight: bold;">₹1,00,000 goal</span>
+                    </div>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Winter Clothing')">Donate Now</button>
+                </div>
+            </div>
+
+            <!-- Request Card 6 -->
+            <div class="card">
+                <div class="card-image">💊</div>
+                <div class="card-content">
+                    <h3 class="card-title">Medicine for Elderly Care Home</h3>
+                    <p class="card-description">Monthly medicine and healthcare supplies for 30 elderly residents in care home.</p>
+                    <div class="card-meta">
+                        <span class="badge badge-active">Active</span>
+                        <span style="color: var(--text-secondary);">Posted 6 days ago</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 88%;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                        <span style="color: var(--text-secondary);">₹44,000 raised</span>
+                        <span style="color: var(--primary); font-weight: bold;">₹50,000 goal</span>
+                    </div>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Elderly Care')">Donate Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Login / Sign Up</h2>
+                <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <div id="loginSuccess" class="success-message"></div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" required placeholder="your.email@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" required placeholder="Enter your password">
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" style="width: auto;">
+                        Remember me
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+                    Don't have an account? <a href="#" style="color: var(--primary);" onclick="showSignup()">Sign up here</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Donate Modal -->
+    <div class="modal" id="donateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Make a Donation</h2>
+                <button class="close-btn" onclick="closeModal('donateModal')">&times;</button>
+            </div>
+            <div id="donateSuccess" class="success-message"></div>
+            <form id="donateForm" onsubmit="handleDonation(event)">
+                <div class="form-group">
+                    <label>Select Cause</label>
+                    <select id="donationCause" required>
+                        <option value="">Choose a cause...</option>
+                        <option value="medical">Medical Emergency</option>
+                        <option value="education">Education Support</option>
+                        <option value="food">Food Distribution</option>
+                        <option value="shelter">Flood Relief</option>
+                        <option value="clothing">Winter Clothing</option>
+                        <option value="elderly">Elderly Care</option>
+                        <option value="general">General Donation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Donation Amount (₹)</label>
+                    <input type="number" id="donationAmount" required min="100" placeholder="Enter amount">
+                </div>
+                <div class="form-group">
+                    <label>Quick Select</label>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-secondary" style="padding: 0.5rem 1rem;" onclick="setAmount(500)">₹500</button>
+                        <button type="button" class="btn btn-secondary" style="padding: 0.5rem 1rem;" onclick="setAmount(1000)">₹1,000</button>
+                        <button type="button" class="btn btn-secondary" style="padding: 0.5rem 1rem;" onclick="setAmount(2500)">₹2,500</button>
+                        <button type="button" class="btn btn-secondary" style="padding: 0.5rem 1rem;" onclick="setAmount(5000)">₹5,000</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <div class="payment-methods">
+                        <div class="payment-method" onclick="selectPayment('card')">
+                            <div class="payment-icon">💳</div>
+                            <div>Card</div>
+                        </div>
+                        <div class="payment-method" onclick="selectPayment('upi')">
+                            <div class="payment-icon">📱</div>
+                            <div>UPI</div>
+                        </div>
+                        <div class="payment-method" onclick="selectPayment('netbanking')">
+                            <div class="payment-icon">🏦</div>
+                            <div>Net Banking</div>
+                        </div>
+                        <div class="payment-method" onclick="selectPayment('wallet')">
+                            <div class="payment-icon">👛</div>
+                            <div>Wallet</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" required placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" required placeholder="your.email@example.com">
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" style="width: auto;">
+                        Make this a monthly donation
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;">Proceed to Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Request Help Modal -->
+    <div class="modal" id="requestModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Request Help</h2>
+                <button class="close-btn" onclick="closeModal('requestModal')">&times;</button>
+            </div>
+            <div id="requestSuccess" class="success-message"></div>
+            <form id="requestForm" onsubmit="handleRequest(event)">
+                <div class="form-group">
+                    <label>Request Title</label>
+                    <input type="text" required placeholder="Brief title for your request">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select required>
+                        <option value="">Select category...</option>
+                        <option value="medical">Medical Emergency</option>
+                        <option value="education">Education</option>
+                        <option value="food">Food & Nutrition</option>
+                        <option value="shelter">Shelter & Housing</option>
+                        <option value="clothing">Clothing</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Detailed Description</label>
+                    <textarea required placeholder="Explain your situation in detail..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Amount Needed (₹)</label>
+                    <input type="number" required min="1000" placeholder="Enter amount">
+                </div>
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" required placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="tel" required placeholder="+91 XXXXX XXXXX">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" required placeholder="your.email@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" required placeholder="City, State">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="about">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Helping Hands</h3>
+                <p style="color: var(--text-secondary); line-height: 1.6;">
+                    A platform connecting generous donors with people in need. We believe in the power of community and collective action to make a positive impact.
+                </p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#donate">Donate</a></li>
+                    <li><a href="#requests">Active Requests</a></li>
+                    <li><a href="#about">About Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#docs">Documentation</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#privacy">Privacy Policy</a></li>
+                    <li><a href="#terms">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul>
+                    <li>📧 support@helpinghands.org</li>
+                    <li>📞 +91 1800-XXX-XXXX</li>
+                    <li>📍 Mumbai, India</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Helping Hands. All rights reserved. Built with ❤️ for humanity.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function openDonateModal(cause) {
+            openModal('donateModal');
+            const causeMap = {
+                'Medical Emergency': 'medical',
+                'Education Support': 'education',
+                'Food Distribution': 'food',
+                'Flood Relief': 'shelter',
+                'Winter Clothing': 'clothing',
+                'Elderly Care': 'elderly'
+            };
+            document.getElementById('donationCause').value = causeMap[cause] || 'general';
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Set donation amount
+        function setAmount(amount) {
+            document.getElementById('donationAmount').value = amount;
+        }
+
+        // Select payment method
+        let selectedPayment = null;
+        function selectPayment(method) {
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.target.closest('.payment-method').classList.add('selected');
+            selectedPayment = method;
+        }
+
+        // Handle Login
+        function handleLogin(event) {
+            event.preventDefault();
+            const successMsg = document.getElementById('loginSuccess');
+            successMsg.textContent = '✓ Login successful! Welcome back.';
+            successMsg.classList.add('show');
+            
+            setTimeout(() => {
+                closeModal('loginModal');
+                successMsg.classList.remove('show');
+            }, 2000);
+        }
+
+        // Handle Donation
+        function handleDonation(event) {
+            event.preventDefault();
+            
+            if (!selectedPayment) {
+                alert('Please select a payment method');
+                return;
+            }
+
+            const amount = document.getElementById('donationAmount').value;
+            const successMsg = document.getElementById('donateSuccess');
+            successMsg.textContent = `✓ Thank you! Your donation of ₹${amount} is being processed via ${selectedPayment.toUpperCase()}.`;
+            successMsg.classList.add('show');
+            
+            setTimeout(() => {
+                closeModal('donateModal');
+                successMsg.classList.remove('show');
+                event.target.reset();
+                selectedPayment = null;
+                document.querySelectorAll('.payment-method').forEach(el => {
+                    el.classList.remove('selected');
+                });
+            }, 3000);
+        }
+
+        // Handle Request
+        function handleRequest(event) {
+            event.preventDefault();
+            const successMsg = document.getElementById('requestSuccess');
+            successMsg.textContent = '✓ Your request has been submitted successfully! Our team will review it shortly.';
+            successMsg.classList.add('show');
+            
+            setTimeout(() => {
+                closeModal('requestModal');
+                successMsg.classList.remove('show');
+                event.target.reset();
+            }, 3000);
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animate stats on scroll
+        const observerOptions = {
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .stat-card').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
