@@ -144,6 +144,27 @@
             width: 100%;
         }
 
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info.active {
+            display: flex;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
         /* Buttons */
         .btn {
             padding: 0.75rem 1.5rem;
@@ -188,6 +209,11 @@
 
         .btn-success {
             background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
             color: white;
         }
 
@@ -541,6 +567,20 @@
             margin-bottom: 0.5rem;
         }
 
+        .payment-details {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--dark-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .payment-details.active {
+            display: block;
+            animation: fadeInUp 0.3s;
+        }
+
         /* Footer */
         footer {
             background: var(--dark-card);
@@ -642,6 +682,21 @@
             animation: fadeInUp 0.5s;
         }
 
+        .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: fadeInUp 0.5s;
+        }
+
         /* Scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
@@ -658,6 +713,26 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary-dark);
+        }
+
+        .form-toggle {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .form-toggle a {
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .form-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -680,7 +755,14 @@
                 <a href="#donate">Donate</a>
                 <a href="#requests">Requests</a>
                 <a href="#about">About</a>
-                <button class="btn btn-primary" onclick="openModal('loginModal')">Login / Sign Up</button>
+                <div id="authButtons">
+                    <button class="btn btn-primary" onclick="openModal('loginModal')">Login / Sign Up</button>
+                </div>
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span id="userName">User</span>
+                    <button class="btn btn-danger" onclick="logout()">Logout</button>
+                </div>
             </div>
         </nav>
     </header>
@@ -719,7 +801,7 @@
     <section class="container" id="requests">
         <h2 class="section-title">Active Help Requests</h2>
         <div class="cards-grid" id="requestsGrid">
-            <!-- Request Card 1 -->
+            <!-- Request Cards will be dynamically loaded -->
             <div class="card">
                 <div class="card-image">🏥</div>
                 <div class="card-content">
@@ -736,11 +818,10 @@
                         <span style="color: var(--text-secondary);">₹3,25,000 raised</span>
                         <span style="color: var(--primary); font-weight: bold;">₹5,00,000 goal</span>
                     </div>
-                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Medical Emergency')">Donate Now</button>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('medical', 'Medical Emergency')">Donate Now</button>
                 </div>
             </div>
 
-            <!-- Request Card 2 -->
             <div class="card">
                 <div class="card-image">📚</div>
                 <div class="card-content">
@@ -757,11 +838,10 @@
                         <span style="color: var(--text-secondary);">₹42,000 raised</span>
                         <span style="color: var(--primary); font-weight: bold;">₹1,00,000 goal</span>
                     </div>
-                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Education Support')">Donate Now</button>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('education', 'Education Support')">Donate Now</button>
                 </div>
             </div>
 
-            <!-- Request Card 3 -->
             <div class="card">
                 <div class="card-image">🍲</div>
                 <div class="card-content">
@@ -778,11 +858,10 @@
                         <span style="color: var(--text-secondary);">₹78,000 raised</span>
                         <span style="color: var(--primary); font-weight: bold;">₹1,00,000 goal</span>
                     </div>
-                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Food Distribution')">Donate Now</button>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('food', 'Food Distribution')">Donate Now</button>
                 </div>
             </div>
 
-            <!-- Request Card 4 -->
             <div class="card">
                 <div class="card-image">🏠</div>
                 <div class="card-content">
@@ -799,11 +878,10 @@
                         <span style="color: var(--text-secondary);">₹2,75,000 raised</span>
                         <span style="color: var(--primary); font-weight: bold;">₹5,00,000 goal</span>
                     </div>
-                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Flood Relief')">Donate Now</button>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('shelter', 'Flood Relief')">Donate Now</button>
                 </div>
             </div>
 
-            <!-- Request Card 5 -->
             <div class="card">
                 <div class="card-image">👕</div>
                 <div class="card-content">
@@ -820,11 +898,10 @@
                         <span style="color: var(--text-secondary);">₹30,000 raised</span>
                         <span style="color: var(--primary); font-weight: bold;">₹1,00,000 goal</span>
                     </div>
-                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Winter Clothing')">Donate Now</button>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('clothing', 'Winter Clothing')">Donate Now</button>
                 </div>
             </div>
 
-            <!-- Request Card 6 -->
             <div class="card">
                 <div class="card-image">💊</div>
                 <div class="card-content">
@@ -841,28 +918,31 @@
                         <span style="color: var(--text-secondary);">₹44,000 raised</span>
                         <span style="color: var(--primary); font-weight: bold;">₹50,000 goal</span>
                     </div>
-                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('Elderly Care')">Donate Now</button>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="openDonateModal('elderly', 'Elderly Care')">Donate Now</button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Login Modal -->
+    <!-- Login/Signup Modal -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Login / Sign Up</h2>
+                <h2 class="modal-title" id="authTitle">Login</h2>
                 <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
             </div>
             <div id="loginSuccess" class="success-message"></div>
+            <div id="loginError" class="error-message"></div>
+            
+            <!-- Login Form -->
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="email" required placeholder="your.email@example.com">
+                    <input type="email" id="loginEmail" required placeholder="your.email@example.com">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" required placeholder="Enter your password">
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
                 </div>
                 <div class="form-group">
                     <label style="display: flex; align-items: center; gap: 0.5rem;">
@@ -871,8 +951,42 @@
                     </label>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
-                <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
-                    Don't have an account? <a href="#" style="color: var(--primary);" onclick="showSignup()">Sign up here</a>
+                <p class="form-toggle">
+                    Don't have an account? <a onclick="toggleAuthForm()">Sign up here</a>
+                </p>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signupForm" class="hidden" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="signupName" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="signupEmail" required placeholder="your.email@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="signupPhone" required placeholder="+91 XXXXX XXXXX">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="signupPassword" required placeholder="Create a password" minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" required placeholder="Confirm your password">
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" style="width: auto;" required>
+                        I agree to the Terms & Conditions
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Sign Up</button>
+                <p class="form-toggle">
+                    Already have an account? <a onclick="toggleAuthForm()">Login here</a>
                 </p>
             </form>
         </div>
@@ -886,6 +1000,7 @@
                 <button class="close-btn" onclick="closeModal('donateModal')">&times;</button>
             </div>
             <div id="donateSuccess" class="success-message"></div>
+            <div id="donateError" class="error-message"></div>
             <form id="donateForm" onsubmit="handleDonation(event)">
                 <div class="form-group">
                     <label>Select Cause</label>
@@ -934,21 +1049,87 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Card Payment Details -->
+                <div id="cardDetails" class="payment-details">
+                    <div class="form-group">
+                        <label>Card Number</label>
+                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Expiry Date</label>
+                            <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="text" id="cardCVV" placeholder="123" maxlength="3">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cardholder Name</label>
+                        <input type="text" id="cardName" placeholder="Name on card">
+                    </div>
+                </div>
+
+                <!-- UPI Payment Details -->
+                <div id="upiDetails" class="payment-details">
+                    <div class="form-group">
+                        <label>UPI ID</label>
+                        <input type="text" id="upiId" placeholder="yourname@upi">
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                        You will receive a payment request on your UPI app
+                    </p>
+                </div>
+
+                <!-- Net Banking Details -->
+                <div id="netbankingDetails" class="payment-details">
+                    <div class="form-group">
+                        <label>Select Bank</label>
+                        <select id="bankSelect">
+                            <option value="">Choose your bank...</option>
+                            <option value="sbi">State Bank of India</option>
+                            <option value="hdfc">HDFC Bank</option>
+                            <option value="icici">ICICI Bank</option>
+                            <option value="axis">Axis Bank</option>
+                            <option value="pnb">Punjab National Bank</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Wallet Payment Details -->
+                <div id="walletDetails" class="payment-details">
+                    <div class="form-group">
+                        <label>Select Wallet</label>
+                        <select id="walletSelect">
+                            <option value="">Choose wallet...</option>
+                            <option value="paytm">Paytm</option>
+                            <option value="phonepe">PhonePe</option>
+                            <option value="googlepay">Google Pay</option>
+                            <option value="amazonpay">Amazon Pay</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>Your Name</label>
-                    <input type="text" required placeholder="Enter your name">
+                    <input type="text" id="donorName" required placeholder="Enter your name">
                 </div>
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="email" required placeholder="your.email@example.com">
+                    <input type="email" id="donorEmail" required placeholder="your.email@example.com">
                 </div>
                 <div class="form-group">
                     <label style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" style="width: auto;">
+                        <input type="checkbox" id="monthlyDonation" style="width: auto;">
                         Make this a monthly donation
                     </label>
                 </div>
-                <button type="submit" class="btn btn-success" style="width: 100%;">Proceed to Payment</button>
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    <span id="paymentButtonText">Proceed to Payment</span>
+                </button>
             </form>
         </div>
     </div>
@@ -961,6 +1142,7 @@
                 <button class="close-btn" onclick="closeModal('requestModal')">&times;</button>
             </div>
             <div id="requestSuccess" class="success-message"></div>
+            <div id="requestError" class="error-message"></div>
             <form id="requestForm" onsubmit="handleRequest(event)">
                 <div class="form-group">
                     <label>Request Title</label>
@@ -1049,6 +1231,113 @@
     </footer>
 
     <script>
+        // User session management
+        let currentUser = null;
+
+        // Check if user is logged in
+        function checkAuth() {
+            const user = localStorage.getItem('helpingHandsUser');
+            if (user) {
+                currentUser = JSON.parse(user);
+                updateUIForLoggedInUser();
+            }
+        }
+
+        function updateUIForLoggedInUser() {
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('userInfo').classList.add('active');
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+        }
+
+        function logout() {
+            localStorage.removeItem('helpingHandsUser');
+            currentUser = null;
+            document.getElementById('authButtons').style.display = 'block';
+            document.getElementById('userInfo').classList.remove('active');
+            showMessage('loginSuccess', 'Logged out successfully!');
+        }
+
+        // Toggle between login and signup forms
+        function toggleAuthForm() {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const authTitle = document.getElementById('authTitle');
+            
+            if (loginForm.classList.contains('hidden')) {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                authTitle.textContent = 'Login';
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                authTitle.textContent = 'Sign Up';
+            }
+            
+            // Clear messages
+            document.getElementById('loginSuccess').classList.remove('show');
+            document.getElementById('loginError').classList.remove('show');
+        }
+
+        // Handle Login
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Simulate login (in production, this would be an API call)
+            const users = JSON.parse(localStorage.getItem('helpingHandsUsers') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                currentUser = { name: user.name, email: user.email };
+                localStorage.setItem('helpingHandsUser', JSON.stringify(currentUser));
+                showMessage('loginSuccess', '✓ Login successful! Welcome back, ' + user.name);
+                updateUIForLoggedInUser();
+                
+                setTimeout(() => {
+                    closeModal('loginModal');
+                    document.getElementById('loginForm').reset();
+                }, 2000);
+            } else {
+                showMessage('loginError', '✗ Invalid email or password. Please try again.');
+            }
+        }
+
+        // Handle Signup
+        function handleSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const phone = document.getElementById('signupPhone').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+            if (password !== confirmPassword) {
+                showMessage('loginError', '✗ Passwords do not match!');
+                return;
+            }
+
+            // Save user (in production, this would be an API call)
+            const users = JSON.parse(localStorage.getItem('helpingHandsUsers') || '[]');
+            
+            // Check if email already exists
+            if (users.find(u => u.email === email)) {
+                showMessage('loginError', '✗ Email already registered. Please login.');
+                return;
+            }
+
+            users.push({ name, email, phone, password });
+            localStorage.setItem('helpingHandsUsers', JSON.stringify(users));
+
+            showMessage('loginSuccess', '✓ Account created successfully! Please login.');
+            
+            setTimeout(() => {
+                toggleAuthForm();
+                document.getElementById('signupForm').reset();
+            }, 2000);
+        }
+
         // Modal Functions
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('active');
@@ -1056,19 +1345,15 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
+            // Reset payment selection
+            document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.payment-details').forEach(el => el.classList.remove('active'));
+            selectedPayment = null;
         }
 
-        function openDonateModal(cause) {
+        function openDonateModal(causeId, causeName) {
             openModal('donateModal');
-            const causeMap = {
-                'Medical Emergency': 'medical',
-                'Education Support': 'education',
-                'Food Distribution': 'food',
-                'Flood Relief': 'shelter',
-                'Winter Clothing': 'clothing',
-                'Elderly Care': 'elderly'
-            };
-            document.getElementById('donationCause').value = causeMap[cause] || 'general';
+            document.getElementById('donationCause').value = causeId;
         }
 
         // Close modal on outside click
@@ -1091,19 +1376,23 @@
             });
             event.target.closest('.payment-method').classList.add('selected');
             selectedPayment = method;
-        }
 
-        // Handle Login
-        function handleLogin(event) {
-            event.preventDefault();
-            const successMsg = document.getElementById('loginSuccess');
-            successMsg.textContent = '✓ Login successful! Welcome back.';
-            successMsg.classList.add('show');
+            // Hide all payment details
+            document.querySelectorAll('.payment-details').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected payment details
+            const detailsMap = {
+                'card': 'cardDetails',
+                'upi': 'upiDetails',
+                'netbanking': 'netbankingDetails',
+                'wallet': 'walletDetails'
+            };
             
-            setTimeout(() => {
-                closeModal('loginModal');
-                successMsg.classList.remove('show');
-            }, 2000);
+            if (detailsMap[method]) {
+                document.getElementById(detailsMap[method]).classList.add('active');
+            }
         }
 
         // Handle Donation
@@ -1111,39 +1400,148 @@
             event.preventDefault();
             
             if (!selectedPayment) {
-                alert('Please select a payment method');
+                showMessage('donateError', '✗ Please select a payment method');
                 return;
             }
 
             const amount = document.getElementById('donationAmount').value;
-            const successMsg = document.getElementById('donateSuccess');
-            successMsg.textContent = `✓ Thank you! Your donation of ₹${amount} is being processed via ${selectedPayment.toUpperCase()}.`;
-            successMsg.classList.add('show');
-            
+            const cause = document.getElementById('donationCause').options[document.getElementById('donationCause').selectedIndex].text;
+            const name = document.getElementById('donorName').value;
+            const email = document.getElementById('donorEmail').value;
+            const isMonthly = document.getElementById('monthlyDonation').checked;
+
+            // Validate payment details based on method
+            let paymentValid = true;
+            let paymentInfo = '';
+
+            if (selectedPayment === 'card') {
+                const cardNumber = document.getElementById('cardNumber').value;
+                const cardExpiry = document.getElementById('cardExpiry').value;
+                const cardCVV = document.getElementById('cardCVV').value;
+                const cardName = document.getElementById('cardName').value;
+                
+                if (!cardNumber || !cardExpiry || !cardCVV || !cardName) {
+                    showMessage('donateError', '✗ Please fill in all card details');
+                    return;
+                }
+                paymentInfo = `Card ending in ${cardNumber.slice(-4)}`;
+            } else if (selectedPayment === 'upi') {
+                const upiId = document.getElementById('upiId').value;
+                if (!upiId) {
+                    showMessage('donateError', '✗ Please enter your UPI ID');
+                    return;
+                }
+                paymentInfo = `UPI: ${upiId}`;
+            } else if (selectedPayment === 'netbanking') {
+                const bank = document.getElementById('bankSelect').value;
+                if (!bank) {
+                    showMessage('donateError', '✗ Please select your bank');
+                    return;
+                }
+                paymentInfo = `Net Banking: ${bank.toUpperCase()}`;
+            } else if (selectedPayment === 'wallet') {
+                const wallet = document.getElementById('walletSelect').value;
+                if (!wallet) {
+                    showMessage('donateError', '✗ Please select a wallet');
+                    return;
+                }
+                paymentInfo = `Wallet: ${wallet}`;
+            }
+
+            // Simulate payment processing
+            const button = event.target.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="loading"></span> Processing...';
+            button.disabled = true;
+
             setTimeout(() => {
-                closeModal('donateModal');
-                successMsg.classList.remove('show');
-                event.target.reset();
-                selectedPayment = null;
-                document.querySelectorAll('.payment-method').forEach(el => {
-                    el.classList.remove('selected');
+                // Save donation to localStorage
+                const donations = JSON.parse(localStorage.getItem('helpingHandsDonations') || '[]');
+                donations.push({
+                    amount,
+                    cause,
+                    name,
+                    email,
+                    paymentMethod: selectedPayment,
+                    paymentInfo,
+                    isMonthly,
+                    date: new Date().toISOString()
                 });
-            }, 3000);
+                localStorage.setItem('helpingHandsDonations', JSON.stringify(donations));
+
+                button.innerHTML = originalText;
+                button.disabled = false;
+
+                const monthlyText = isMonthly ? ' (Monthly)' : '';
+                showMessage('donateSuccess', `✓ Payment Successful! Thank you ${name} for donating ₹${amount} to ${cause}${monthlyText} via ${selectedPayment.toUpperCase()}. Receipt sent to ${email}.`);
+                
+                setTimeout(() => {
+                    closeModal('donateModal');
+                    document.getElementById('donateForm').reset();
+                    document.getElementById('donateSuccess').classList.remove('show');
+                }, 4000);
+            }, 2000);
         }
 
         // Handle Request
         function handleRequest(event) {
             event.preventDefault();
-            const successMsg = document.getElementById('requestSuccess');
-            successMsg.textContent = '✓ Your request has been submitted successfully! Our team will review it shortly.';
-            successMsg.classList.add('show');
+            
+            const button = event.target.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="loading"></span> Submitting...';
+            button.disabled = true;
+
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+                showMessage('requestSuccess', '✓ Your request has been submitted successfully! Our team will review it within 24-48 hours and contact you via email.');
+                
+                setTimeout(() => {
+                    closeModal('requestModal');
+                    document.getElementById('requestForm').reset();
+                    document.getElementById('requestSuccess').classList.remove('show');
+                }, 3000);
+            }, 1500);
+        }
+
+        // Show message helper
+        function showMessage(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.classList.add('show');
             
             setTimeout(() => {
-                closeModal('requestModal');
-                successMsg.classList.remove('show');
-                event.target.reset();
-            }, 3000);
+                element.classList.remove('show');
+            }, 5000);
         }
+
+        // Format card number input
+        document.addEventListener('DOMContentLoaded', function() {
+            const cardNumberInput = document.getElementById('cardNumber');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\s/g, '');
+                    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                    e.target.value = formattedValue;
+                });
+            }
+
+            const cardExpiryInput = document.getElementById('cardExpiry');
+            if (cardExpiryInput) {
+                cardExpiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // Check auth on page load
+            checkAuth();
+        });
 
         // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
